@@ -1,5 +1,6 @@
 package eu.hxreborn.biometricapplock.ui.component
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -11,6 +12,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.unit.dp
 import eu.hxreborn.biometricapplock.ui.theme.Tokens
 
 enum class SectionPosition { Single, Top, Middle, Bottom }
@@ -30,7 +32,12 @@ fun SectionCard(
         )
     val colors =
         CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+        )
+    val border =
+        BorderStroke(
+            width = 1.dp,
+            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.35f),
         )
     val shape = sectionShape(position)
     when {
@@ -43,24 +50,35 @@ fun SectionCard(
                     ),
                 shape = shape,
                 colors = colors,
+                border = border,
             ) { content() }
         }
 
         onClick != null -> {
-            Card(onClick = onClick, modifier = cardModifier, shape = shape, colors = colors) { content() }
+            Card(
+                onClick = onClick,
+                modifier = cardModifier,
+                shape = shape,
+                colors = colors,
+                border = border,
+            ) { content() }
         }
 
         else -> {
-            Card(modifier = cardModifier, shape = shape, colors = colors) { content() }
+            Card(
+                modifier = cardModifier,
+                shape = shape,
+                colors = colors,
+                border = border,
+            ) { content() }
         }
     }
 }
 
 @Composable
 private fun sectionShape(position: SectionPosition): Shape {
-    val largeShape = MaterialTheme.shapes.large as? RoundedCornerShape
-    val large = largeShape?.topStart ?: CornerSize(Tokens.AppIconCornerRadius)
-    val small = CornerSize(Tokens.SmallCornerRadius)
+    val large = CornerSize(Tokens.OneUiCardRadius)
+    val small = CornerSize(6.dp)
     return when (position) {
         SectionPosition.Single -> RoundedCornerShape(large, large, large, large)
         SectionPosition.Top -> RoundedCornerShape(large, large, small, small)

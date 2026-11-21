@@ -13,6 +13,8 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import eu.hxreborn.biometricapplock.App
 import eu.hxreborn.biometricapplock.BuildConfig
 import eu.hxreborn.biometricapplock.prefs.Prefs
+import eu.hxreborn.biometricapplock.root.RootLockService
+import eu.hxreborn.biometricapplock.root.RootServiceState
 import eu.hxreborn.biometricapplock.util.RootShell
 import io.github.libxposed.service.HotReloadResult
 import io.github.libxposed.service.XposedService
@@ -22,7 +24,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -67,6 +69,8 @@ class ScopeViewModel(
     private val _rootGranted = MutableStateFlow<Boolean?>(null)
     val rootGranted: StateFlow<Boolean?> = _rootGranted.asStateFlow()
 
+    val rootServiceState: StateFlow<RootServiceState> = RootLockService.serviceState
+
     private val apkUpdatedAfterBoot: Boolean by lazy {
         runCatching {
             val bootEpoch = System.currentTimeMillis() - SystemClock.elapsedRealtime()
@@ -76,14 +80,48 @@ class ScopeViewModel(
     }
 
     val moduleStatus: StateFlow<ModuleStatus> =
-        _framework.map(::deriveStatus).stateIn(viewModelScope, SharingStarted.Eagerly, deriveStatus(_framework.value))
+        combine(_framework, rootServiceState, _rootGranted) { framework, rootState, rootOk ->
+            deriveStatus(framework, rootState, rootOk)
+        }.stateIn(
+            viewModelScope,
+            SharingStarted.Eagerly,
+            deriveStatus(_framework.value, rootServiceState.value, _rootGranted.value),
+        )
 
-    private fun deriveStatus(framework: FrameworkInfo?): ModuleStatus =
+    private fun deriveStatus(
+        framework: FrameworkInfo?,
+        rootState: RootServiceState,
+        rootOk: Boolean?,
+    ): ModuleStatus =
         when {
-            framework == null -> ModuleStatus.NotEnabled
-            apkUpdatedAfterBoot && !framework.supportsHotReload -> ModuleStatus.RebootRequired
-            else -> ModuleStatus.Enabled
+            rootState is RootServiceState.Running -> ModuleStatus.Enabled
+            framework != null && apkUpdatedAfterBoot && !framework.supportsHotReload -> ModuleStatus.RebootRequired
+            framework != null -> ModuleStatus.Enabled
+            rootOk == true && rootState is RootServiceState.Starting -> ModuleStatus.Enabled
+            else -> ModuleStatus.NotEnabled
         }
+
+    fun toggleRootProtection(enable: Boolean) {
+        app.prefsRepository.save(Prefs.ROOT_PROTECTION_ENABLED, enable)
+        if (enable) {
+            requestRootAndStart()
+        } else {
+            RootLockService.stop(getApplication())
+        }
+    }
+
+    fun requestRootAndStart() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val granted = RootShell.isRootGranted()
+            _rootGranted.value = granted
+            if (granted) {
+                app.prefsRepository.save(Prefs.ROOT_PROTECTION_ENABLED, true)
+                RootLockService.start(getApplication())
+            } else {
+                toast("Grant root access to Ingufuri in KernelSU / Magisk")
+            }
+        }
+    }
 
     private val serviceListener =
         object : XposedServiceHelper.OnServiceListener {

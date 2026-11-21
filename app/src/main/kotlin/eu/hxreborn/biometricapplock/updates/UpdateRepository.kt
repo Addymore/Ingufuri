@@ -19,8 +19,8 @@ import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URI
 
-private const val TAG = "BiometricAppLock"
-private const val REPO = "hxreborn/biometric-app-lock"
+private const val TAG = "Ingufuri"
+private const val REPO = "Addymore/Ingufuri"
 private const val RELEASE_URL = "https://api.github.com/repos/$REPO/releases/latest"
 private const val CHANGELOG_URL = "https://raw.githubusercontent.com/$REPO/main/CHANGELOG.json"
 private const val GRADLE_PROPS_URL_FORMAT =

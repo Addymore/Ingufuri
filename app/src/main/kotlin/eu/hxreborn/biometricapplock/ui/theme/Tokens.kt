@@ -21,11 +21,14 @@ object Tokens {
     val PreferenceRowIconTextSpacing: Dp = 16.dp
     val PreferenceRowTrailingSpacing: Dp = 8.dp
 
-    val SectionItemSpacing: Dp = 2.dp
-    val SectionHorizontalMargin: Dp = 12.dp
-    val SectionHeaderStartPadding: Dp = 16.dp
-    val SectionHeaderTopPadding: Dp = 16.dp
-    val SectionHeaderBottomPadding: Dp = 6.dp
+    val SectionItemSpacing: Dp = 3.dp
+    val SectionHorizontalMargin: Dp = 14.dp
+    val SectionHeaderStartPadding: Dp = 18.dp
+    val SectionHeaderTopPadding: Dp = 18.dp
+    val SectionHeaderBottomPadding: Dp = 8.dp
+    val OneUiCardRadius: Dp = 24.dp
+    val BentoCardRadius: Dp = 24.dp
+    val BentoGridSpacing: Dp = 10.dp
     val SettingsIconSize: Dp = 24.dp
     val SmallIconSize: Dp = 20.dp
 

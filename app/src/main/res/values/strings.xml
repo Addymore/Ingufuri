@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Biometric App Locker</string>
-    <string name="module_description">Locks apps you choose behind fingerprint or face unlock at the System Framework level</string>
+    <string name="app_name">Ingufuri</string>
+    <string name="module_description">Root-powered biometric app locker for One UI 9</string>
 
-    <string name="app_bar_title">Biometric App Locker</string>
+    <string name="app_bar_title">Ingufuri</string>
 
     <string name="tab_dashboard">Dashboard</string>
     <string name="tab_apps">Apps</string>
@@ -15,7 +15,27 @@
     <string name="dashboard_locked_apps_empty">Add apps to lock</string>
     <string name="env_footer_unbound">Xposed not bound</string>
 
-    <string name="status_active">Module enabled</string>
+    <string name="status_active">Protection active</string>
+    <string name="status_root_active">Protected via Root</string>
+    <string name="status_root_needed">Root access needed</string>
+    <string name="status_root_needed_action">Grant superuser access to Ingufuri in KernelSU or Magisk</string>
+    <string name="status_paused">Protection paused</string>
+    <string name="status_paused_action">Enable the switch to resume root app locking</string>
+    <string name="status_root_started">Root monitor running %1$s</string>
+    <string name="engine_chip_root">Root Engine</string>
+    <string name="engine_chip_xposed">Xposed</string>
+    <string name="engine_chip_no_root">No Root</string>
+    <string name="engine_chip_paused">Paused</string>
+    <string name="action_grant_root">Grant Root</string>
+    <string name="bento_locked_apps">Protected apps</string>
+    <string name="bento_self_lock">Self-lock</string>
+    <string name="bento_state_on">ON</string>
+    <string name="bento_state_off">OFF</string>
+    <string name="root_channel_name">Root Protection Engine</string>
+    <string name="root_channel_description">Keeps Ingufuri root app lock active in the background</string>
+    <string name="root_notif_title">Ingufuri protection active</string>
+    <string name="root_notif_ready">Monitoring apps via root</string>
+
     <string name="status_inactive">Not enabled</string>
     <string name="status_inactive_action">Enable the module in your Xposed manager, then reopen this app</string>
     <string name="status_reboot_required">Reboot required</string>
@@ -150,7 +170,8 @@
 
     <string name="about_title">About</string>
     <string name="about_back_cd">Back</string>
-    <string name="about_app_name">Biometric App Locker</string>
+    <string name="about_app_name">Ingufuri</string>
+    <string name="about_fork_credit">Forked from Biometric App Lock v1.12.0 (GPL-3.0)</string>
     <string name="about_source_title">Source code</string>
     <string name="about_source_summary">Browse the project on GitHub</string>
     <string name="about_report_issue_title">Report an issue</string>

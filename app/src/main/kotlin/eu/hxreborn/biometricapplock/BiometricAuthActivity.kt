@@ -11,7 +11,9 @@ import android.hardware.biometrics.BiometricPrompt
 import android.os.Bundle
 import android.os.CancellationSignal
 import android.util.Log
+import android.view.WindowManager
 import eu.hxreborn.biometricapplock.prefs.Prefs
+import eu.hxreborn.biometricapplock.root.RootLockState
 import eu.hxreborn.biometricapplock.util.METHODS_ALL
 import eu.hxreborn.biometricapplock.util.METHOD_BIOMETRIC
 import eu.hxreborn.biometricapplock.util.METHOD_WEAK_OK
@@ -29,8 +31,11 @@ private const val TAG = "BiometricAppLock"
  */
 open class BiometricAuthActivity : Activity() {
     private var targetPkg: String? = null
+    private var targetUserId: Int = 0
     private var authToken: String? = null
     private var uninstallAuth = false
+    private var rootMode = false
+    private var rootInstaller = false
     private var replied = false
 
     // the launch transition cancels a prompt started before the window gains focus
@@ -38,9 +43,13 @@ open class BiometricAuthActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
         targetPkg = intent.getStringExtra(EXTRA_TARGET_PKG)
+        targetUserId = intent.getIntExtra(EXTRA_TARGET_USER_ID, 0)
         authToken = intent.getStringExtra(EXTRA_AUTH_TOKEN)
         uninstallAuth = intent.getBooleanExtra(EXTRA_UNINSTALL_AUTH, false)
+        rootMode = intent.getBooleanExtra(EXTRA_ROOT_MODE, false)
+        rootInstaller = intent.getBooleanExtra(EXTRA_ROOT_INSTALLER, false)
 
         if (uninstallAuth) {
             Log.i(TAG, "uninstall auth pkg=$targetPkg")
@@ -48,6 +57,37 @@ open class BiometricAuthActivity : Activity() {
                 targetPkg?.let(::loadLabel) ?: getString(R.string.biometric_prompt_default_target)
             pendingPrompt = {
                 showPrompt(getString(R.string.biometric_prompt_uninstall_title, label))
+            }
+            return
+        }
+
+        if (rootMode) {
+            val pkg = targetPkg
+            if (pkg.isNullOrEmpty()) {
+                RootLockState.clearAuthInFlight()
+                finish()
+                return
+            }
+            Log.i(TAG, "root gating $pkg user=$targetUserId installer=$rootInstaller")
+            val label =
+                runCatching {
+                    val launcherApps = getSystemService(LauncherApps::class.java)
+                    val info =
+                        launcherApps
+                            .getActivityList(
+                                pkg,
+                                getUserHandle(targetUserId),
+                            ).firstOrNull()
+                    info?.label?.toString() ?: loadLabel(pkg)
+                }.getOrDefault(pkg)
+            pendingPrompt = {
+                val promptTitle =
+                    if (rootInstaller) {
+                        getString(R.string.biometric_prompt_uninstall_title, label)
+                    } else {
+                        getString(R.string.biometric_prompt_unlock_title, label)
+                    }
+                showPrompt(promptTitle, if (rootInstaller) null else "$pkg:$targetUserId")
             }
             return
         }
@@ -235,7 +275,26 @@ open class BiometricAuthActivity : Activity() {
         replied = true
         faceScanOverlay?.dismiss()
         faceScanOverlay = null
-        Log.d(TAG, "onResult code=$code pkg=$targetPkg uninstallAuth=$uninstallAuth")
+        Log.d(
+            TAG,
+            "onResult code=$code pkg=$targetPkg uninstallAuth=$uninstallAuth rootMode=$rootMode",
+        )
+        if (rootMode) {
+            val pkg = targetPkg
+            if (code == AUTH_OK && !pkg.isNullOrEmpty()) {
+                if (rootInstaller) {
+                    RootLockState.grantInstaller()
+                    RootLockState.clearAuthInFlight()
+                } else {
+                    RootLockState.addUnlocked(pkg, targetUserId)
+                }
+            } else {
+                RootLockState.clearAuthInFlight()
+                goHome()
+            }
+            finish()
+            return
+        }
         if (uninstallAuth) {
             // nothing is waiting behind this prompt, so grant on success and leave the screen
             if (code == AUTH_OK) grantUninstall()
@@ -311,17 +370,21 @@ open class BiometricAuthActivity : Activity() {
     }
 
     companion object {
-        const val MODULE_PACKAGE = "eu.hxreborn.biometricapplock"
-        const val AUTH_ACTIVITY = "$MODULE_PACKAGE.BiometricAuthActivity"
+        const val MODULE_PACKAGE = BuildConfig.APPLICATION_ID
+        const val AUTH_ACTIVITY = "eu.hxreborn.biometricapplock.BiometricAuthActivity"
 
         // opaque-window variant, launched when the solid unlock screen is enabled
-        const val OPAQUE_AUTH_ACTIVITY = "$MODULE_PACKAGE.OpaqueAuthActivity"
+        const val OPAQUE_AUTH_ACTIVITY = "eu.hxreborn.biometricapplock.OpaqueAuthActivity"
 
         const val EXTRA_TARGET_PKG = "$MODULE_PACKAGE.TARGET_PKG"
         const val EXTRA_TARGET_USER_ID = "$MODULE_PACKAGE.TARGET_USER_ID"
         const val EXTRA_AUTH_TOKEN = "$MODULE_PACKAGE.AUTH_TOKEN"
         const val EXTRA_TARGET_ACTIVITY = "$MODULE_PACKAGE.TARGET_ACTIVITY"
         const val EXTRA_RESUME_SIGNAL = "$MODULE_PACKAGE.RESUME_SIGNAL"
+
+        // root mode extras
+        const val EXTRA_ROOT_MODE = "$MODULE_PACKAGE.ROOT_MODE"
+        const val EXTRA_ROOT_INSTALLER = "$MODULE_PACKAGE.ROOT_INSTALLER"
 
         // uninstall backstop mode: no token, a good auth writes the grant pref instead of resuming
         const val EXTRA_UNINSTALL_AUTH = "$MODULE_PACKAGE.UNINSTALL_AUTH"

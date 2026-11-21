@@ -62,6 +62,7 @@ import eu.hxreborn.biometricapplock.prefs.Prefs
 import eu.hxreborn.biometricapplock.ui.component.BackButton
 import eu.hxreborn.biometricapplock.ui.component.ExpandedTitle
 import eu.hxreborn.biometricapplock.ui.component.LockSwitch
+import eu.hxreborn.biometricapplock.ui.component.SectionCard
 import eu.hxreborn.biometricapplock.ui.component.SectionPosition
 import eu.hxreborn.biometricapplock.ui.screen.settings.PreferenceRow
 import eu.hxreborn.biometricapplock.ui.screen.settings.SettingsSectionHeader
@@ -361,30 +362,32 @@ private fun AppHeaderCard(
     icon: ImageBitmap?,
     modifier: Modifier = Modifier,
 ) {
-    Row(
-        modifier =
-            modifier.fillMaxWidth().padding(
-                horizontal = Tokens.DetailHeaderCardPadding,
-                vertical = Tokens.DetailHeaderCardPadding,
-            ),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        DetailAppIcon(icon = icon, modifier = Modifier.size(Tokens.DetailHeaderIconSize))
-        Spacer(Modifier.width(Tokens.DetailHeaderIconTextSpacing))
-        Column {
-            Text(appName, style = MaterialTheme.typography.titleMedium)
-            Text(
-                text = packageName,
-                style = MaterialTheme.typography.bodySmall,
-                fontFamily = FontFamily.Monospace,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            if (versionName != null) {
+    SectionCard(modifier = modifier, position = SectionPosition.Single) {
+        Row(
+            modifier =
+                Modifier.fillMaxWidth().padding(
+                    horizontal = Tokens.DetailHeaderCardPadding,
+                    vertical = Tokens.DetailHeaderCardPadding,
+                ),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            DetailAppIcon(icon = icon, modifier = Modifier.size(Tokens.DetailHeaderIconSize))
+            Spacer(Modifier.width(Tokens.DetailHeaderIconTextSpacing))
+            Column {
+                Text(appName, style = MaterialTheme.typography.titleMedium)
                 Text(
-                    text = versionName,
+                    text = packageName,
                     style = MaterialTheme.typography.bodySmall,
+                    fontFamily = FontFamily.Monospace,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
+                if (versionName != null) {
+                    Text(
+                        text = versionName,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
             }
         }
     }

@@ -63,7 +63,7 @@ import eu.hxreborn.biometricapplock.ui.viewmodel.FrameworkInfo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-private const val REPO_URL = "https://github.com/hxreborn/biometric-app-lock"
+private const val REPO_URL = "https://github.com/Addymore/Ingufuri"
 private const val BLOB_SPIN_DURATION_MS = 8_000
 private val BlobSize: Dp = 128.dp
 private val BlobIconSize: Dp = 72.dp

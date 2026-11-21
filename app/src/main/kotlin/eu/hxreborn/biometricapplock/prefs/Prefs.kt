@@ -38,6 +38,7 @@ object Prefs {
     val LAST_REMOTE_WRITE = LongPref("_last_remote_write", 0L)
 
     val FLOATING_NAV_BAR = BoolPref("floating_nav_bar", true)
+    val ROOT_PROTECTION_ENABLED = BoolPref("root_protection_enabled", true)
 
     val AUTO_CHECK_UPDATE = BoolPref("auto_check_update", true)
     val LAST_UPDATE_CHECK_MS = LongPref("last_update_check_ms", 0L)
@@ -69,6 +70,7 @@ object Prefs {
             UNINSTALL_AUTH_GRANT_MS,
             LAST_REMOTE_WRITE,
             FLOATING_NAV_BAR,
+            ROOT_PROTECTION_ENABLED,
             AUTO_CHECK_UPDATE,
             LAST_UPDATE_CHECK_MS,
             LAST_RELEASE_JSON,

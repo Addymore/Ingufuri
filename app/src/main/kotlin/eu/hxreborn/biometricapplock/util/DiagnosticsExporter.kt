@@ -47,7 +47,7 @@ object DiagnosticsExporter {
             }
             val dir = File(context.cacheDir, "diagnostics").apply { mkdirs() }
             val stamp = SimpleDateFormat("yyyyMMdd-HHmmss", Locale.US).format(Date())
-            File(dir, "biometricapplock-$stamp.log").apply {
+            File(dir, "ingufuri-$stamp.log").apply {
                 writeText(body(framework, hookLog, appLog, crashLog))
             }
         }

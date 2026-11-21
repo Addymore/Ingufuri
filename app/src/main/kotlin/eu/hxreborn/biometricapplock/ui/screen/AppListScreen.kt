@@ -463,8 +463,7 @@ fun AppListScreen(
     val app = App.from(context)
 
     val scope by viewModel.scope.collectAsStateWithLifecycle()
-    val framework by viewModel.framework.collectAsStateWithLifecycle()
-    val serviceAvailable = framework != null
+    val serviceAvailable = true
 
     val searchTextFieldState = rememberTextFieldState()
     var debouncedQuery by remember { mutableStateOf("") }

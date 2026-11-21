@@ -10,11 +10,11 @@ import android.os.Handler
 import eu.hxreborn.biometricapplock.hook.applyHookConfig
 import eu.hxreborn.biometricapplock.util.Logger
 
-internal const val ACTION_CONFIG_SYNC = "eu.hxreborn.biometricapplock.action.CONFIG_SYNC"
+internal const val ACTION_CONFIG_SYNC = "com.ingufuri.applock.action.CONFIG_SYNC"
 internal const val EXTRA_CONFIG = "config"
 
 // signature level, so only a build signed with the module key can push config into system_server
-internal const val CONFIG_SYNC_PERMISSION = "eu.hxreborn.biometricapplock.permission.CONFIG_SYNC"
+internal const val CONFIG_SYNC_PERMISSION = "com.ingufuri.applock.permission.CONFIG_SYNC"
 
 // carries the whole pref map because the hook cannot re-read the module's own prefs file, and on
 // some Xposed builds the handle it holds never sees a write

@@ -13,6 +13,7 @@ import eu.hxreborn.biometricapplock.receiver.ACTION_CONFIG_SYNC
 import eu.hxreborn.biometricapplock.receiver.CONFIG_SYNC_PERMISSION
 import eu.hxreborn.biometricapplock.receiver.EXTRA_CONFIG
 import eu.hxreborn.biometricapplock.receiver.buildConfigBundle
+import eu.hxreborn.biometricapplock.root.RootLockService
 import eu.hxreborn.biometricapplock.updates.UpdateRepository
 import eu.hxreborn.biometricapplock.util.RootShell
 import io.github.libxposed.service.XposedService
@@ -51,6 +52,9 @@ class App :
             }
         localPrefs.registerOnSharedPreferenceChangeListener(configPushListener)
         XposedServiceHelper.registerListener(this)
+        if (Prefs.ROOT_PROTECTION_ENABLED.read(localPrefs)) {
+            RootLockService.start(this)
+        }
         if (BuildConfig.DEBUG) raiseLogBuffers()
     }
 
